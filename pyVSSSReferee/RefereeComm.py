@@ -40,10 +40,20 @@ class RefereeComm(threading.Thread):
         self.referee_port = int(os.environ.get('REFEREE_PORT', self.config['network']['referee_port']))
         self.host = os.environ.get('REFEREE_IP', self.config['network']['referee_ip'])
 
+        self.referee_sock = None
+
         self._can_play = False
         self._color = None
         self._quadrant = None
         self._foul = None
+    
+    def get_last_foul(self):
+        return {
+            'foul': self._foul,
+            'quadrant': self._quadrant,
+            'color': self._color,
+            'can_play': self._can_play
+        }
 
     
     def run(self):
@@ -56,7 +66,6 @@ class RefereeComm(threading.Thread):
             data = self.referee_sock.recv(1024)
             c.ParseFromString(data)
             self._status = json.loads(MessageToJson(c))
-            print(self._status)
 
             self._can_play = self._status.get('foul') == 'GAME_ON'
             if (self._status.get('foul') != 'GAME_ON'):
@@ -64,7 +73,7 @@ class RefereeComm(threading.Thread):
             if (self._status.get('foul') == 'FREE_BALL'):
                 self._quadrant = self._status.get('foulQuadrant')
             elif (self._status.get('foul') == 'PENALTY_KICK' or self._status.get('foul') == 'GOAL_KICK'):
-                self._color = self._status.get('teamcolor')
+                self._color = self._status.get('teamcolor', 'BLUE')
 
     def can_play(self):
         """Returns if game is currently on GAME_ON."""
