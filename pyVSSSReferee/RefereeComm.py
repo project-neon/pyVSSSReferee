@@ -4,9 +4,10 @@ import json
 import struct
 import socket
 import threading
+import time
 
 from google.protobuf.json_format import MessageToJson
-from protocols import vssref_command_pb2
+from protocols import vssref_command_pb2, vssref_placement_pb2, vssref_common_pb2
 
 def get_config(config_file=None):
     """Return parsed config_file."""
@@ -39,6 +40,7 @@ class RefereeComm(threading.Thread):
 
         self.referee_port = int(os.environ.get('REFEREE_PORT', self.config['network']['referee_port']))
         self.host = os.environ.get('REFEREE_IP', self.config['network']['referee_ip'])
+        self.replacer_port = int(os.environ.get('REPLACER_PORT', self.config['network']['replacer_port']))
 
         self.referee_sock = None
 
@@ -54,7 +56,6 @@ class RefereeComm(threading.Thread):
             'color': self._color,
             'can_play': self._can_play
         }
-
     
     def run(self):
         """Calls _create_socket() and parses the status message from the Referee."""
@@ -95,6 +96,25 @@ class RefereeComm(threading.Thread):
         """Return current foul."""
         return self._foul
 
+    def send_replacement(self, robot_replacements, team_color):
+        """Receives team color and list of x and y coordinates, angle and ids of robots and sends to Referee.
+        
+        Team color must be in uppercase, either 'BLUE' or 'YELLOW'.
+        """
+
+        replacements = vssref_placement_pb2.VSSRef_Placement()
+        frame = vssref_common_pb2.Frame()
+        frame.teamColor = 0 if team_color == "BLUE" else 1
+        for robot in robot_replacements:
+            replacement = frame.robots.add()
+            replacement.robot_id = robot['robot_id']
+            replacement.x = robot['x']
+            replacement.y = robot['y']
+            replacement.orientation = robot['orientation']
+        replacements.world.CopyFrom(frame)
+        self.referee_sock.sendto(replacements.SerializeToString(), (self.host, self.replacer_port))
+        
+
     def _create_socket(self):
         """Returns a new socket binded to the Referee."""
         sock = socket.socket(
@@ -127,3 +147,6 @@ class RefereeComm(threading.Thread):
 if __name__ == "__main__":
     r = RefereeComm()
     r.start()
+    while (True):
+        time.sleep(1)
+        r.send_replacement([{"robot_id": 0, "x": 0.4, "y": 0.4, "orientation": 0}], "BLUE")
