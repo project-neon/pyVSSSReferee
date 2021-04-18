@@ -5,6 +5,9 @@ import struct
 import socket
 import threading
 import time
+import pathlib
+ 
+script_dir = pathlib.Path(__file__).parent.resolve()
 
 from google.protobuf.json_format import MessageToJson
 from protocols import vssref_command_pb2, vssref_placement_pb2, vssref_common_pb2
@@ -25,7 +28,8 @@ class RefereeComm(threading.Thread):
 
         Methods:
             run(): calls _create_socket() and parses the status message from the Referee.
-            can_play(): returns if game is currently on GAME_ON.
+            can_play(): returns true if game is currently on GAME_ON.
+            get_last_foul(): Returns last foul information.
             get_status(): returns current status.
             get_color(): Returns color of the team that will kick in the penalty or goal kick.
             get_quadrant(): Returns the quandrant in which the free ball will occur.
@@ -50,6 +54,11 @@ class RefereeComm(threading.Thread):
         self._foul = None
     
     def get_last_foul(self):
+        """Returns last foul information.
+
+        Returns foul, quadrant, color and can_play (true if foul is GAME_ON).
+        """
+        
         return {
             'foul': self._foul,
             'quadrant': self._quadrant,
@@ -147,6 +156,3 @@ class RefereeComm(threading.Thread):
 if __name__ == "__main__":
     r = RefereeComm()
     r.start()
-    while (True):
-        time.sleep(1)
-        r.send_replacement([{"robot_id": 0, "x": 0.4, "y": 0.4, "orientation": 0}], "BLUE")
