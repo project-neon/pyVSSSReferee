@@ -5,12 +5,9 @@ import struct
 import socket
 import threading
 import time
-import pathlib
- 
-script_dir = pathlib.Path(__file__).parent.resolve()
 
 from google.protobuf.json_format import MessageToJson
-from protocols import vssref_command_pb2, vssref_placement_pb2, vssref_common_pb2
+from .protocols import vssref_command_pb2, vssref_placement_pb2, vssref_common_pb2
 
 def get_config(config_file=None):
     """Return parsed config_file."""
@@ -23,21 +20,21 @@ def get_config(config_file=None):
 
 class RefereeComm(threading.Thread):
     
-    def __init__(self):
+    def __init__(self, config_file = None):
         """The RefereeComm class creates a socket to communicate with the Referee.
 
         Methods:
             run(): calls _create_socket() and parses the status message from the Referee.
             can_play(): returns true if game is currently on GAME_ON.
             get_last_foul(): Returns last foul information.
-            get_status(): returns current status.
+            get_status(): returns current status message sent by the referee.
             get_color(): Returns color of the team that will kick in the penalty or goal kick.
             get_quadrant(): Returns the quandrant in which the free ball will occur.
             get_foul(): Return current foul.
             _create_socket(): returns new socket binded to the Referee.
         """
         super(RefereeComm, self).__init__()
-        self.config = get_config()
+        self.config = get_config(config_file)
         self.commands = []
 
         self._status = None
@@ -90,7 +87,7 @@ class RefereeComm(threading.Thread):
         return self._can_play
 
     def get_status(self):
-        """Returns current status."""
+        """Returns current status message sent by the referee."""
         return self._status
 
     def get_color(self):
