@@ -70,3 +70,7 @@ Some important methods are:
 | get_quadrant | Returns the quandrant in which the free ball will occur. |
 | get_foul | Returns current foul. |
 | send_replacement | Receives team color and list of x and y coordinates, angle and ids of robots and sends to the Referee. Team color must be in uppercase, either 'BLUE' or 'YELLOW'. |
+
+## Colaboration Guide
+In order to colaborate with this repository, use the Project Neon guidelines to git:
+https://github.com/project-neon/codestyleguide/blob/master/git.md
