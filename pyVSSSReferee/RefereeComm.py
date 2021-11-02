@@ -77,10 +77,12 @@ class RefereeComm(threading.Thread):
             self._can_play = self._status.get('foul') == 'GAME_ON'
             if (self._status.get('foul') != 'GAME_ON'):
                 self._foul = self._status.get('foul')
-            if (self._status.get('foul') == 'FREE_BALL'):
-                self._quadrant = self._status.get('foulQuadrant')
-            elif (self._status.get('foul') == 'PENALTY_KICK' or self._status.get('foul') == 'GOAL_KICK'):
-                self._color = self._status.get('teamcolor', 'BLUE')
+                if (self._status.get('foul') == 7):
+                    self._foul = 'HALT'
+                if (self._status.get('foul') == 'FREE_BALL'):
+                    self._quadrant = self._status.get('foulQuadrant')
+            
+            self._color = self._status.get('teamcolor', 'BLUE')
 
     def can_play(self):
         """Returns if game is currently on GAME_ON."""
