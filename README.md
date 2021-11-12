@@ -6,21 +6,9 @@ Easily create a network socket between the VSSS League's referee and your VSSS s
 - protobuf==3.6.1
 
 ## Installation
-1. Clone this repository
+Use the code below to install the package from PyPI:
 
-`git clone https://github.com/project-neon/pyVSSSReferee`
-
-2. Open directory
-
-`cd pyVSSSReferee`
-
-3. Install dependencies
-
-`pip install -r requirements.txt`
-
-4. Finally, install the package
-
-`python3 setup.py install`
+`pip install pyVSSSReferee`
 
 ## A Simple Example
 1. In a test folder, save the code below as config.json
@@ -72,5 +60,22 @@ Some important methods are:
 | send_replacement | Receives team color and list of x and y coordinates, angle and ids of robots and sends to the Referee. Team color must be in uppercase, either 'BLUE' or 'YELLOW'. |
 
 ## Colaboration Guide
-In order to colaborate with this repository, use the Project Neon guidelines to git:
+In order to colaborate with this repository, clone this repository:
+
+`git clone https://github.com/project-neon/pyVSSSReferee`
+
+Open directory
+
+`cd pyVSSSReferee`
+
+Then install dependencies
+
+`pip install -r requirements.txt`
+
+Finally, install the package
+
+`python3 setup.py install`
+
+
+Remember to use the Project Neon guidelines to git:
 https://github.com/project-neon/codestyleguide/blob/master/git.md
